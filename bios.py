@@ -24,7 +24,7 @@ class Frame(wx.Frame):
                 f"Installable Languages: {bios.InstallableLanguages}\n"
                 f"List of Languages: {bios.ListOfLanguages}\n"
                 f"Serial Number: {bios.SerialNumber}\n"
-                f"Status: {bios.Status}\n")
+                f"Status: Bios is {bios.Status}\n")
 
         wx.TextCtrl(self.pnl, -1, bios_info, size = (1500, 1500), style = (wx.TE_MULTILINE | wx.TE_READONLY))
 

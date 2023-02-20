@@ -1,4 +1,7 @@
-import subprocess, wmi
+#more work is comming to this module soon, not yet completed.
+
+import subprocess
+import wmi
 import wx
 
 def get_size(bytes):

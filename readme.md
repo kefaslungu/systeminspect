@@ -7,7 +7,7 @@ The goal of SystemInspect is to provide users with an easy way to view important
 
 more functionality will be added in future releases.
 ## Requirements.
-note: this section is intended for those who want to compile from source, without using the executable.
+note: this section is intended for those who want to compile from source, without using the [executable.](https://github.com/kefaslungu/systeminspect/releases/download/V0.1.1/systeminspectV0.1.1.exe)
 
 To run SystemInspect, you must have Python 3 and the following libraries installed:
 

@@ -1,9 +1,14 @@
+# battery.py
+# A part of System inspect
+# This file is covered by the GNU General Public License.
+# Copyright (C) 2023 kefaslungu
+
 import subprocess
 import wmi
 import psutil
-import wx
 
 def battery_information():
+    """Provides information about your system's battery."""
     battery = psutil.sensors_battery()
     batteryInfo = {
     "has_battery": str(subprocess.getoutput(["powershell", "@(Get-CimInstance -ClassName Win32_Battery).Count -gt 0 "])),

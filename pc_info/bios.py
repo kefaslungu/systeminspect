@@ -1,8 +1,13 @@
-import wmi
-import wx
+# bios.py
+# A part of System inspect
+# This file is covered by the GNU General Public License.
+# Copyright (C) 2023 kefaslungu
+
 import subprocess
+import wmi
 
 def bios():
+    """Provides information about your bios."""
     bios_mode = subprocess.getoutput(["powershell","$env:firmware_type"])
     c = wmi.WMI()
     for bios in c.Win32_BIOS():

@@ -1,8 +1,20 @@
+# __init__.py
+# A part of System inspect
+# This file is covered by the GNU General Public License.
+# Copyright (C) 2023 kefaslungu
+__author__ = """kefaslungu"""
+__email__ = 'jameskefaslungu@gmail.com'
+__version__ = '0.1.1'
 
-from pc_info import battery
-from pc_info import bios
-from pc_info import cpu
-from pc_info import disks
-from pc_info import memory_converter
-from pc_info import motherboard 
-from pc_info import ram 
+from pc_info import(
+basic_info,
+battery,
+bios,
+cpu,
+disks,
+memory_converter,
+motherboard ,
+ram,
+sound,
+startup
+)

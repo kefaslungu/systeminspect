@@ -1,7 +1,11 @@
+# disks.py
+# A part of System inspect
+# This file is covered by the GNU General Public License.
+# Copyright (C) 2023 kefaslungu
+
 import subprocess
 import psutil
 import wmi
-import wx
 #import memory_converter
 def get_size(bytes):
     """

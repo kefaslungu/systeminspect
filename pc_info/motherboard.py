@@ -1,7 +1,12 @@
-import wx
+# motherboard.py
+# A part of System inspect
+# This file is covered by the GNU General Public License.
+# Copyright (C) 2023 kefaslungu
+
 import wmi
 
 def motherboard():
+    """Gathers all information about your motherboard."""
     c = wmi.WMI()
     for board in c.Win32_BaseBoard():
         motherboard_info = (f"Motherboard information:\n"

@@ -1,5 +1,9 @@
+# ram.py
+# A part of System inspect
+# This file is covered by the GNU General Public License.
+# Copyright (C) 2023 kefaslungu
+
 import subprocess
-import wx
 import psutil
 import wmi
 
@@ -17,6 +21,7 @@ def get_size(bytes):
         bytes /= factor
             
 def ram_info():
+    """Returns all information about your ram, from usage to hard ware information."""
     memory_usage = psutil.virtual_memory()
     technical_ram_info = ''
     c = wmi.WMI()

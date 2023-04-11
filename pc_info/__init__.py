@@ -14,6 +14,7 @@ cpu,
 disks,
 memory_converter,
 motherboard ,
+network_info,
 ram,
 sound,
 startup

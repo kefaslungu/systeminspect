@@ -6,25 +6,25 @@
 import wmi
 
 def basicInfo():
-    """Provides all the necessary basic information about your operating system, and your hard ware."""
+    """Provides all the necessary basic information about your operating system, and your hardware."""
     c = wmi.WMI()
-    for win in c.Win32_OperatingSystem():
-        os_info = (f"OS name: {win.Caption}.\n"
-               f"OS Manufacturer: {win.Manufacturer}.\n"
-               f"Version: {win.Version}.\n"
-               f"Build number: {win.BuildNumber}.\n"
-               f"Windows Serial number: {win.SerialNumber}.\n")
 
-    for computer in c.Win32_ComputerSystem():
-        pc_info = (f"Computer name: {computer.Name}.\n"
-               f"PC manufacturer: {computer.Manufacturer}.\n"
-               f"System model: {computer.Model}.\n"
-               f"System type: {computer.SystemType}.\n"
-               f"System family: {computer.SystemFamily}.\n"
-               f"System SKU: {computer.SystemSKUNumber}.\n"
-               f"Owner: {computer.PrimaryOwnerName}.\n"
-               f"DNSHostName: {computer.DNSHostName}.\n"
-               f"A Hypervisor is present: {computer.HypervisorPresent}.\n")
-    about_windows =f"{os_info}{pc_info}"
-    return about_windows  
+    os_info = ["OS name: {}\n"
+               "OS Manufacturer: {}\n"
+               "Version: {}\n"
+               "Build number: {}\n"
+               "Windows Serial number: {}\n".format(win.Caption, win.Manufacturer, win.Version, win.BuildNumber, win.SerialNumber) for win in c.Win32_OperatingSystem()]
 
+    pc_info = ["Computer name: {}\n"
+               "PC manufacturer: {}\n"
+               "System model: {}\n"
+               "System type: {}\n"
+               "System family: {}\n"
+               "System SKU: {}\n"
+               "Owner: {}\n"
+               "DNSHostName: {}\n"
+               "A Hypervisor is present: {}\n".format(computer.Name, computer.Manufacturer, computer.Model, computer.SystemType, computer.SystemFamily, computer.SystemSKUNumber, computer.PrimaryOwnerName, computer.DNSHostName, computer.HypervisorPresent) for computer in c.Win32_ComputerSystem()]
+
+    about_windows = "\n".join(os_info) + "\n" + "\n".join(pc_info)
+
+    return about_windows

@@ -12,10 +12,12 @@ battery,
 bios,
 cpu,
 disks,
+graphics,
 memory_converter,
 motherboard ,
 network_info,
 ram,
 sound,
-startup
+startup,
+tools
 )

@@ -4,8 +4,8 @@ This file is covered by the GNU General Public License.
 Copyright (C) 2023 kefaslungu
 this is the main file for the System inspect utility. Please see the readme file for what it does."""
 
-from subprocess import run
-from os import system
+from subprocess import run, Popen
+import os
 from threading import Thread as t
 import winreg
 import wx
@@ -16,6 +16,7 @@ from pc_info import (
     bios,
     cpu,
     disks,
+    graphics,
     motherboard,
     network_info,
     ram,
@@ -25,11 +26,34 @@ from pc_info import (
 class Frame(wx.Frame):
     """This is the class that inherit the wx frame, and all other functions are written in this class, or is used to call other functions else where."""
     def __init__(self):
-        super().__init__(None, wx.ID_ANY, title="System InspectV0.1.1 by Kefas Lungu")
+        super().__init__(None, wx.ID_ANY, title="System InspectV2.1.1 by Kefas Lungu")
         self.pnl = wx.Panel(self)
 
         self.system_inspect(self.pnl)
         self.Show()
+
+    def system_tools(self, parent):
+        builtin_tools = (
+            (self.system_scan, 'Basic system scan'),
+            (self.diskCleanup, 'DiskCleanup Utility'),
+            (self.diskDefragmenter, 'Disk defragmenter'),
+            (self.directXDiagnosticTool, 'DirectX'),
+            (self.driverVerifier, 'Windows driver verifier'),
+            (self.eventViewer, 'EventViewer'),
+            (self.resourceMonitor, 'ResourceMonitor'),
+            (self.systemConfiguration, 'windows system configuration'),
+            (self.taskManager, 'Task manager'),
+            (self.windowsMemoryDiagnostic, 'Windows Memory Diagnostic'),
+            (self.uninstaller, 'Uninstall a program'),
+            (self.maliciousRemoval, 'Windows malicious removal tool'),
+            (self.fireWall, 'Windows fire wall'),
+            (self.advanceFireWall, 'Windows advance fireWall'),
+            (self.sysReset, 'Reset this PC')
+        )
+        buttons = []
+        for handler, label in builtin_tools:
+            buttons.append(self.create_button(parent, label, handler))
+        return buttons
 
     def new_user(self, event):
         dlg = wx.Dialog(self, title="Create New User", size=(400, 300))
@@ -58,12 +82,12 @@ class Frame(wx.Frame):
         dlg.ShowModal()
         if dlg.GetReturnCode() == wx.ID_OK and text2.GetValue() == text3.GetValue():
             cmd = ["net", "user", text1.GetValue(), text2.GetValue(), "/add"]
-            result = subprocess.run(cmd, capture_output=True, text=True)
+            result = run(cmd, capture_output=True, text=True)
             if result.returncode == 0:
                 wx.MessageBox("User created successfully!", "Success", wx.OK | wx.ICON_INFORMATION)
             else:
                 wx.MessageBox(f"Error creating user: {result.stderr}", "Error", wx.OK | wx.ICON_ERROR)
-        elif dlg.GetReturnCode() == wx.ID_OK:
+        elif dlg.GetReturnCode() != wx.ID_OK and text2.GetValue() == text3.GetValue():
             wx.MessageBox("Passwords do not match!", "Error", wx.OK | wx.ICON_ERROR)
         dlg.Destroy()
 
@@ -95,7 +119,7 @@ class Frame(wx.Frame):
         dlg.ShowModal()
         if dlg.GetReturnCode() == wx.ID_OK and text2.GetValue() == text3.GetValue():
             cmd = ["net", "user", username, text2.GetValue()]
-            result = subprocess.run(cmd, capture_output=True, text=True)
+            result = run(cmd, capture_output=True, text=True)
             if result.returncode == 0:
                 wx.MessageBox(f"{username}'s password was changed successfully!", "Success", wx.OK | wx.ICON_INFORMATION)
             else:
@@ -149,8 +173,8 @@ class Frame(wx.Frame):
             cmd = f"net accounts /maxpwage:{max_password_age} /minpwlen:{min_password_length} " \
                   f"/minpwage:{min_password_age} /uniquepw:{num_unique_passwords}"
     
-            # Execute the command using subprocess.run()
-            result = subprocess.run(cmd, capture_output=True, text=True)
+            # Execute the command using run()
+            result = run(cmd, capture_output=True, text=True)
             if result.returncode == 0:
                 wx.MessageBox("Password rules updated successfully!", "Success", wx.OK | wx.ICON_INFORMATION)
             else:
@@ -225,6 +249,7 @@ class Frame(wx.Frame):
             (bios.bios, 'Bios information'),
             (cpu.cpu_stats, 'Cpu information'),
             (disks.disk_info, 'Disk information'),
+            (graphics.graphicsInfo, 'Graphics card information'),
             (motherboard.motherboard, 'Motherboard information'),
             (network_info.networkCards, 'networkCards'),
             (ram.ram_info, 'Ram information'),
@@ -247,7 +272,7 @@ class Frame(wx.Frame):
         dlg = wx.Dialog(self, wx.ID_ANY, label, size=(500, 500))
         text_ctrl = wx.TextCtrl(dlg, wx.ID_ANY, value=info, style=wx.TE_MULTILINE | wx.TE_READONLY)
 
-        # Add a 'Copy to Clipboard' button
+        # Add an option to Copy the current dialog to the Clipboard
         copy_button = wx.Button(dlg, wx.ID_ANY, "Copy to Clipboard")
         copy_button.Bind(wx.EVT_BUTTON, lambda event, info=info: copy(info))
                 
@@ -265,10 +290,11 @@ class Frame(wx.Frame):
         dlg.SetSizer(sizer)
         
         dlg.ShowModal()
-        dlg.Destroy()
+        dlg.Destroy()    
+
     def system_inspect(self, parent):
         notebook = wx.Notebook(parent)
-        functions = ((self.pc_inspect, 'system information'), (self.admin, 'user settings'))
+        functions = ((self.pc_inspect, 'system information'), (self.admin, 'user settings'), (self.system_tools, 'Builtin windows self'))
         for handler, label in functions:
             page = wx.Panel(notebook)
             sizer = wx.BoxSizer(wx.VERTICAL)
@@ -287,7 +313,7 @@ class Frame(wx.Frame):
     # starting with enabling and disabling administrative account respectively.
     def enable_admin_account(self, parent):
         cmd = ['net', 'user', 'administrator', '/active:yes']
-        result = subprocess.run(cmd, shell=True)
+        result = run(cmd, shell=True)
         if result.returncode == 0:
             wx.MessageBox("Your built-in Administrator account has been enabled successfully!\nHowever, It is recommended to disable it when not needed.", "Success", wx.OK | wx.ICON_INFORMATION)
         else:
@@ -295,20 +321,77 @@ class Frame(wx.Frame):
 
     def disable_admin_account(self, parent):
         cmd = ['net', 'user', 'administrator', '/active:no']
-        result = subprocess.run(cmd, shell=True)
+        result = run(cmd, shell=True)
         if result.returncode == 0:
             wx.MessageBox("Your administrative account has been disabled successfully!", "Success", wx.OK | wx.ICON_INFORMATION)
         else:
             wx.MessageBox(f"Error disabling administrative account: {result.stderr}", "Error", wx.OK | wx.ICON_ERROR)
 
+    def driverVerifier(self, event):
+        t1 = t(target=run, args=("verifier",))
+        t1.start()
+    
+    def taskManager(self, event):
+        t1 = t(target=run, args=("taskmgr",))
+        t1.start()
+    
+    def resourceMonitor(self, event):
+        t1 = t(target=run, args=("resmon",))
+        t1.start()
+    
+    def eventViewer(self, event):
+        t1 = t(target=Popen, args=(['mmc.exe', 'eventvwr.msc'],))
+        t1.start()
+    
+    def systemConfiguration(self, event):
+        t1 = t(target=run, args=("msconfig",))
+        t1.start()
+    
+    def diskCleanup(self, event):
+        t1 = t(target=run, args=("cleanmgr",))
+        t1.start()
+    
+    def diskDefragmenter(self, event):
+        t1 = t(target=run, args=("dfrgui",))
+        t1.start()
+    
+    def windowsMemoryDiagnostic(self, event):
+        t1 = t(target=run, args=("mdsched",))
+        t1.start()
+    
+    def system_scan(self, event):
+        cmd = 'cmd /k start sfc /scannow'
+        t1 = t(target=Popen, args=(cmd, shell:=True,))
+        t1.start()
+
+    def directXDiagnosticTool(self, event):
+        t1 = t(target=run, args=("dxdiag",))
+        t1.start()
+    
+    def uninstaller(self, event):
+        t1 = t(target=Popen, args=(['rundll32.exe', 'shell32.dll,Control_RunDLL', 'appwiz.cpl']))
+        t1.start()
+    
+    def maliciousRemoval(self, event):
+        t1 = t(target=run, args=("mrt",))#Microsoft Windows Malicious Software Removal Tool
+        t1.start()
+    
+    def advanceFireWall(self, event):
+        t1 = t(target=Popen, args=(['mmc.exe', 'wf.msc'],))
+        t1.start()
+    
+    def sysReset(self, event):
+        t1 = t(target=run, args=("systemreset",))
+        t1.start()
+    
+    def fireWall(self, event):
+        t1 = t(target=Popen, args=(['rundll32.exe', 'shell32.dll,Control_RunDLL', 'firewall.cpl'],))
+        t1.start()
+
     def msinfo(self):
         t1 = t(target=run, args=("msinfo32",))
         t1.start()
-
-# a function that exit the application
-    def exit(self, parent):
-        self.Close()
-
+        
 if __name__ == '__main__':
     app = wx.App()
     frame = Frame()

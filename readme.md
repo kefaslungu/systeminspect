@@ -7,7 +7,7 @@ This information is presented in a notebook interface with a tab for each catego
 ## System information:
 information about a computer system. The program utilizes several functions to retrieve information on the following:
 * Basic information such as operating system information, and hardware manifacturer.
-*Detailed information on systems battery.
+* Detailed information on systems battery.
 * computer's BIOS
 * CPU
 * Graphics cards information.
@@ -59,8 +59,10 @@ To run SystemInspect, you must have Python 3 and the following libraries install
 * wmi: this is used to access the windows management instrumentation.
 * psutil: [process and system utilities]. This module is used in several places.
 * pyperclip: Used for copying the system information.
-you can install all these modules by using pip.
+
+You can install all these modules by using pip.
 Subprocess, threading and the os modules are builtin with python, no need to install them from pip.
+
 ## Usage:
 To run SystemInspect after all these modules are installed, simply execute the `systeminspect.py` file.
 

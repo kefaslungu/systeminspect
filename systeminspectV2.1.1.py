@@ -130,7 +130,7 @@ class Frame(wx.Frame):
 
     def password_management(self, event):
         """the main purpose of this function is to collect information from the user on what password settings the user wants to change"""
-        dlg = wx.Dialog(None, title="Password Management")
+        dlg = wx.Dialog(None, title="Change or create password rules")
         pnl = wx.Panel(dlg)    
         label1 = wx.StaticText(pnl, wx.ID_ANY, "Input the maximum password age (in days):")
         text1 = wx.TextCtrl(pnl, wx.ID_ANY, value="")
@@ -231,10 +231,10 @@ class Frame(wx.Frame):
     def admin(self, parent):
         admin_rights = (
         (self.new_user, 'create a new user'),
-        (self.password_management, 'manage multiple password settings'),
+        (self.password_management, 'Change or create password rules'),
         (self.password_complexity, 'create Password complexity'),
-        (self.enable_admin_account, 'enable your builtin administrative account'),
-        (self.disable_admin_account, 'Disable your builting administrative account'),
+        (self.enable_admin_account, 'enable your builtin administrator account'),
+        (self.disable_admin_account, 'Disable your builting administrator account'),
         (self.password_change, 'Change the password for the current user'))
         buttons = []
         for handler, label in admin_rights:
@@ -294,7 +294,7 @@ class Frame(wx.Frame):
 
     def system_inspect(self, parent):
         notebook = wx.Notebook(parent)
-        functions = ((self.pc_inspect, 'system information'), (self.admin, 'user settings'), (self.system_tools, 'Builtin windows self'))
+        functions = ((self.pc_inspect, 'system information'), (self.admin, 'User and password management'), (self.system_tools, 'Builtin windows diagnostic tools'))
         for handler, label in functions:
             page = wx.Panel(notebook)
             sizer = wx.BoxSizer(wx.VERTICAL)
@@ -369,7 +369,7 @@ class Frame(wx.Frame):
         t1.start()
     
     def uninstaller(self, event):
-        t1 = t(target=Popen, args=(['rundll32.exe', 'shell32.dll,Control_RunDLL', 'appwiz.cpl']))
+        t1 = t(target=Popen, args=(['rundll32.exe', 'shell32.dll,Control_RunDLL', 'appwiz.cpl'],))
         t1.start()
     
     def maliciousRemoval(self, event):

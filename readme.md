@@ -1,10 +1,10 @@
-# SystemInspect
+## SystemInspect
 by [Kefas Lungu.](https://github.com/kefaslungu)
 
 SystemInspect is a program that provides detailed information on several hardware and software on your system. It also gives you the ability to configure user and password settings, allows you to manage several builtin windows tools from the app.
 This information is presented in a notebook interface with a tab for each category.
 
-## System information:
+### System information:
 information about a computer system. The program utilizes several functions to retrieve information on the following:
 * Basic information such as operating system information, and hardware manifacturer.
 * Detailed information on systems battery.
@@ -20,7 +20,7 @@ information about a computer system. The program utilizes several functions to r
 
 When a button for the respective item is clicked, a dialog box is displayed with the information, and an uption to copy it to the clipboard.
 
-## User and password management.
+### User and password management.
 This Tab allows you to manage several settings that has to do with user accounts.
 * Create a new user: When this button is clicked, it opens a dialog box for you to type in the new user name, and an uptional password. There are 3 fields in total:
   * User name: the name of the new user.
@@ -38,7 +38,7 @@ Note: all values must be integers. To learn more on password rules: checkout [Th
 * Disabling the administrator account.
 * Change the password for the current user: This settings allows you to create a new password, or change the password of the current login user.
 
-## Builtin windows diagnostic tools:
+### Builtin windows diagnostic tools:
 This catigory is straight forword. It provides a quicker way to call some builtin tools that comes with windows. Most of these tools are there for you to fix an issue with windows, or security related tools. They are:
   * Basic system scan: Uses the builtin sfc utility to check for issues.
   * Disk cleanup: remove junks from your computer.
@@ -51,7 +51,7 @@ The goal of SystemInspect is to provide users with an easy way to view important
 
 more functionality will be added in future releases.
 ## Requirements.
-note: this section is intended for those who want to compile from source, without using the [executable.](https://github.com/kefaslungu/systeminspect/releases/download/V0.1.1/systeminspectV0.1.1.exe)
+note: this section is intended for those who want to compile from source, without using the [executable.](https://github.com/kefaslungu/systeminspect/releases/download/2.1.1/systeminspectV2.1.1.exe)
 
 To run SystemInspect, you must have Python 3 and the following libraries installed:
 
@@ -61,7 +61,10 @@ To run SystemInspect, you must have Python 3 and the following libraries install
 * pyperclip: Used for copying the system information.
 
 You can install all these modules by using pip.
+
 Subprocess, threading and the os modules are builtin with python, no need to install them from pip.
+## download:
+[download V2.1.1 latest](https://github.com/kefaslungu/systeminspect/releases/download/2.1.1/systeminspectV2.1.1.exe)
 
 ## Usage:
 To run SystemInspect after all these modules are installed, simply execute the `systeminspect.py` file.

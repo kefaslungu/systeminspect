@@ -4,10 +4,10 @@ This file is covered by the GNU General Public License.
 Copyright (C) 2023 kefaslungu
 this is the main file for the System inspect utility. Please see the readme file for what it does."""
 
-from subprocess import run, Popen
-import os
-from threading import Thread as t
 import winreg
+from os import environ
+from subprocess import run, Popen
+from threading import Thread as t
 import wx
 from pyperclip import copy
 from pc_info import (
@@ -26,50 +26,40 @@ from pc_info import (
 class Frame(wx.Frame):
     """This is the class that inherit the wx frame, and all other functions are written in this class, or is used to call other functions else where."""
     def __init__(self):
-        super().__init__(None, wx.ID_ANY, title="System InspectV2.1.1 by Kefas Lungu")
+        super().__init__(None, wx.ID_ANY, title = f"Hi {environ['username']}, welcome to system InspectV2.1.1 by Kefas Lungu")
         self.pnl = wx.Panel(self)
+        self.username = environ['username']
 
         self.system_inspect(self.pnl)
         self.Show()
 
-    def system_tools(self, parent):
-        builtin_tools = (
-            (self.system_scan, 'Basic system scan'),
-            (self.diskCleanup, 'DiskCleanup Utility'),
-            (self.diskDefragmenter, 'Disk defragmenter'),
-            (self.directXDiagnosticTool, 'DirectX'),
-            (self.driverVerifier, 'Windows driver verifier'),
-            (self.eventViewer, 'EventViewer'),
-            (self.resourceMonitor, 'ResourceMonitor'),
-            (self.systemConfiguration, 'windows system configuration'),
-            (self.taskManager, 'Task manager'),
-            (self.windowsMemoryDiagnostic, 'Windows Memory Diagnostic'),
-            (self.uninstaller, 'Uninstall a program'),
-            (self.maliciousRemoval, 'Windows malicious removal tool'),
-            (self.fireWall, 'Windows fire wall'),
-            (self.advanceFireWall, 'Windows advance fireWall'),
-            (self.sysReset, 'Reset this PC')
-        )
-        buttons = []
-        for handler, label in builtin_tools:
-            buttons.append(self.create_button(parent, label, handler))
-        return buttons
+    def create_button(self, parent, label, handler):
+        """This function is being call by many other function to create a button, insteadd of creating them independently"""
+        btn = wx.Button(parent, label=label)
+        btn.Bind(wx.EVT_BUTTON, handler)
+        return btn
 
+# the following set of functions, are used to manage user accounts and password.
     def new_user(self, event):
-        dlg = wx.Dialog(self, title="Create New User", size=(400, 300))
+        """ A function that creates a new user account"""
+        dlg = wx.Dialog(self, title="Create a new user account", size=(400, 300))
         pnl = wx.Panel(dlg)
+        # create the label and the text control that holds the username.
         label1 = wx.StaticText(pnl, wx.ID_ANY, "Input the new user name:")
         text1 = wx.TextCtrl(pnl, wx.ID_ANY, value="")
+        # the label and text control for the password.
         label2 = wx.StaticText(pnl, wx.ID_ANY, "Input the new password:")
         text2 = wx.TextCtrl(pnl, wx.ID_ANY, value="", style=wx.TE_PASSWORD)
-        label3 = wx.StaticText(pnl, wx.ID_ANY, "Confirm the new password:")
+        # we need to make sure that the user is sure of the password, collect the password again and only create the user account if both fields match.
+        label3 = wx.StaticText(pnl, wx.ID_ANY, "Confirm password:")
         text3 = wx.TextCtrl(pnl, wx.ID_ANY, value="", style=wx.TE_PASSWORD)
-        ok_btn = wx.Button(pnl, wx.ID_OK, label="OK")
-        cancel_btn = wx.Button(pnl, wx.ID_CANCEL, label="Cancel")
+        ok_btn = wx.Button(pnl, wx.ID_OK, label="Create new user")
+        cancel_btn = wx.Button(pnl, wx.ID_CANCEL, label="Exit")
         button_sizer = wx.BoxSizer(wx.HORIZONTAL)
         button_sizer.AddStretchSpacer()
         button_sizer.Add(ok_btn, 0, wx.ALIGN_BOTTOM | wx.ALL, 5)
         button_sizer.Add(cancel_btn, 0, wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
+        # add the above wigits to the panel
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(label1, 0, wx.ALIGN_LEFT | wx.ALL, 5)
         sizer.Add(text1, 0, wx.EXPAND | wx.ALL, 5)
@@ -87,17 +77,17 @@ class Frame(wx.Frame):
                 wx.MessageBox("User created successfully!", "Success", wx.OK | wx.ICON_INFORMATION)
             else:
                 wx.MessageBox(f"Error creating user: {result.stderr}", "Error", wx.OK | wx.ICON_ERROR)
-        elif dlg.GetReturnCode() != wx.ID_OK and text2.GetValue() == text3.GetValue():
+        elif dlg.GetReturnCode() != wx.ID_OK and text2.GetValue() != text3.GetValue():
             wx.MessageBox("Passwords do not match!", "Error", wx.OK | wx.ICON_ERROR)
         dlg.Destroy()
 
     def password_change(self, event):
+        """the function that change the password for the current user."""
         dlg = wx.Dialog(self, title="Change password for current user", size=(400, 300))
-        username = os.environ['USERNAME']
         pnl = wx.Panel(dlg)
         label1 = wx.StaticText(pnl, wx.ID_ANY, "user name:")
-        CurrentUserName = wx.TextCtrl(pnl, wx.ID_ANY, value=username, style = wx.TE_READONLY)
-        label2 = wx.StaticText(pnl, wx.ID_ANY, f"Input the new password for {username}:")
+        CurrentUserName = wx.TextCtrl(pnl, wx.ID_ANY, value=self.username, style = wx.TE_READONLY)
+        label2 = wx.StaticText(pnl, wx.ID_ANY, f"Input the new password for {self.username}:")
         text2 = wx.TextCtrl(pnl, wx.ID_ANY, value="", style=wx.TE_PASSWORD)
         label3 = wx.StaticText(pnl, wx.ID_ANY, "Confirm the new password:")
         text3 = wx.TextCtrl(pnl, wx.ID_ANY, value="", style=wx.TE_PASSWORD)
@@ -118,14 +108,14 @@ class Frame(wx.Frame):
         pnl.SetSizer(sizer)
         dlg.ShowModal()
         if dlg.GetReturnCode() == wx.ID_OK and text2.GetValue() == text3.GetValue():
-            cmd = ["net", "user", username, text2.GetValue()]
+            cmd = ["net", "user", self.username, text2.GetValue()]
             result = run(cmd, capture_output=True, text=True)
             if result.returncode == 0:
-                wx.MessageBox(f"{username}'s password was changed successfully!", "Success", wx.OK | wx.ICON_INFORMATION)
+                wx.MessageBox(f"{self.username}'s password was changed successfully!", "Success", wx.OK | wx.ICON_INFORMATION)
             else:
-                wx.MessageBox(f"Error changing {username}'s password: {result.stderr}", "Error", wx.OK | wx.ICON_ERROR)
+                wx.MessageBox(f"Error changing {self.username}'s password: {result.stderr}", "Error", wx.OK | wx.ICON_ERROR)
         elif dlg.GetReturnCode() == wx.ID_OK:
-            wx.MessageBox("Passwords do not match!", "Error", wx.OK | wx.ICON_ERROR)
+            wx.MessageBox(f"{self.username}'s new passwords do not match!", "Error", wx.OK | wx.ICON_ERROR)
         dlg.Destroy()
 
     def password_management(self, event):
@@ -173,7 +163,7 @@ class Frame(wx.Frame):
             cmd = f"net accounts /maxpwage:{max_password_age} /minpwlen:{min_password_length} " \
                   f"/minpwage:{min_password_age} /uniquepw:{num_unique_passwords}"
     
-            # Execute the command using run()
+            # Execute the command using run(), from subprocess.run.
             result = run(cmd, capture_output=True, text=True)
             if result.returncode == 0:
                 wx.MessageBox("Password rules updated successfully!", "Success", wx.OK | wx.ICON_INFORMATION)
@@ -223,26 +213,45 @@ class Frame(wx.Frame):
         dlg.ShowModal()
         dlg.Destroy()
 
-    def create_button(self, parent, label, handler):
-        btn = wx.Button(parent, label=label)
-        btn.Bind(wx.EVT_BUTTON, handler)
-        return btn
+    #the next set of functions are used to either create buttons, or call builtin windows tools.
+    def system_tools(self, parent):
+        """ this function is used to call repaire tools that are builtin to windows"""
+        builtin_tools = (
+            (self.system_scan, 'Basic system scan'),
+            (self.diskCleanup, 'DiskCleanup Utility'),
+            (self.diskDefragmenter, 'Disk defragmenter'),
+            (self.directXDiagnosticTool, 'DirectX'),
+            (self.driverVerifier, 'Windows driver verifier'),
+            (self.eventViewer, 'EventViewer'),
+            (self.resourceMonitor, 'ResourceMonitor'),
+            (self.systemConfiguration, 'windows system configuration'),
+            (self.taskManager, 'Task manager'),
+            (self.windowsMemoryDiagnostic, 'Windows Memory Diagnostic'),
+            (self.uninstaller, 'Uninstall a program'),
+            (self.maliciousRemoval, 'Windows malicious removal tool'),
+            (self.fireWall, 'Windows fire wall'),
+            (self.advanceFireWall, 'Windows advance fireWall'),
+            (self.sysReset, 'Reset this PC')
+        )
+        buttons = []
+        for handler, label in builtin_tools:
+            buttons.append(self.create_button(parent, label, handler))
+        return buttons
 
     def admin(self, parent):
         admin_rights = (
-        (self.new_user, 'create a new user'),
-        (self.password_management, 'Change or create password rules'),
-        (self.password_complexity, 'create Password complexity'),
+        (self.new_user, 'create a new user...'),
+        (self.password_management, 'Change or create password rules...'),
+        (self.password_complexity, 'create Password complexity...'),
         (self.enable_admin_account, 'enable your builtin administrator account'),
         (self.disable_admin_account, 'Disable your builting administrator account'),
-        (self.password_change, 'Change the password for the current user'))
+        (self.password_change, f'{self.username}, Change your password...'))
         buttons = []
         for handler, label in admin_rights:
             buttons.append(self.create_button(parent, label, handler))
         return buttons
     
     def pc_inspect(self, parent):
-        """This function collects all functions from the pc_info module, and creates a wx.Button instance for all the functions it can get"""
         functions = (
             (basic_info.basicInfo, 'basic windows information'),
             (battery.battery_information, 'Battery information'),
@@ -259,24 +268,24 @@ class Frame(wx.Frame):
         buttons = []
         for handler, label in functions:
             btn = wx.Button(parent, label=label)
-            if handler == self.msinfo:  # check if the handler is msinfo because it doesn't return a dialog box like other functions.
-                btn.Bind(wx.EVT_BUTTON, lambda event, handler=handler, label=label: handler())  # execute the handler directly to avoid calling the `show_info` function that generates the dialog box, because we don't need it.
+            if handler == self.msinfo:  # check if the handler is msinfo because it doesn't return a dialog box like other functions. It directly call the builtin system information utility.
+                btn.Bind(wx.EVT_BUTTON, lambda event, handler=handler, label=label: handler())  # execute the handler directly to avoid calling the `show_info` function that generates the dialog box, because we don't need it. and even if you do, it won't work well.
             else:
-                btn.Bind(wx.EVT_BUTTON, lambda event, handler=handler, label=label: self.show_info(handler, label))
+                btn.Bind(wx.EVT_BUTTON, lambda event, handler=handler, label=label: self.show_info(handler, label)) # now you can then call the remaining handlers just like that because they will all return a dialog box.
             buttons.append(btn)
         return buttons
 
     def show_info(self, handler, label):
-        """This function shows the information generated by the function in a dialog box"""
+        """This function shows the information generated by the above function in a dialog box"""
         info = handler()
         dlg = wx.Dialog(self, wx.ID_ANY, label, size=(500, 500))
         text_ctrl = wx.TextCtrl(dlg, wx.ID_ANY, value=info, style=wx.TE_MULTILINE | wx.TE_READONLY)
 
         # Add an option to Copy the current dialog to the Clipboard
-        copy_button = wx.Button(dlg, wx.ID_ANY, "Copy to Clipboard")
+        copy_button = wx.Button(dlg, wx.ID_ANY, f"Copy {label} to Clipboard")
         copy_button.Bind(wx.EVT_BUTTON, lambda event, info=info: copy(info))
                 
-        # Add an 'Okay' button to close the dialog box.
+        # Add an 'Okay' button to close the dialog box when clicked.
         ok_button = wx.Button(dlg, wx.ID_OK)
         ok_button.SetDefault()
         # Create a horizontal sizer to hold the buttons
@@ -291,23 +300,6 @@ class Frame(wx.Frame):
         
         dlg.ShowModal()
         dlg.Destroy()    
-
-    def system_inspect(self, parent):
-        notebook = wx.Notebook(parent)
-        functions = ((self.pc_inspect, 'system information'), (self.admin, 'User and password management'), (self.system_tools, 'Builtin windows diagnostic tools'))
-        for handler, label in functions:
-            page = wx.Panel(notebook)
-            sizer = wx.BoxSizer(wx.VERTICAL)
-            page.SetSizer(sizer)
-            notebook.AddPage(page, label)
-            buttons = handler(page)
-            button_sizer = wx.BoxSizer(wx.HORIZONTAL)
-            for button in buttons:
-                button_sizer.Add(button, 1, wx.EXPAND)
-            sizer.Add(button_sizer, 1, wx.EXPAND)
-        sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(notebook, 1, wx.EXPAND)
-        parent.SetSizer(sizer)
 
     # find little functions below, those that need little     or no much gui.
     # starting with enabling and disabling administrative account respectively.
@@ -327,6 +319,7 @@ class Frame(wx.Frame):
         else:
             wx.MessageBox(f"Error disabling administrative account: {result.stderr}", "Error", wx.OK | wx.ICON_ERROR)
 
+# builtin windows tools, found on the third tab in the program
     def driverVerifier(self, event):
         t1 = t(target=run, args=("verifier",))
         t1.start()
@@ -391,8 +384,26 @@ class Frame(wx.Frame):
     def msinfo(self):
         t1 = t(target=run, args=("msinfo32",))
         t1.start()
-        
+
+# Now, create a wx.Notebook  instance that creates and holds different tabs for several settings catigory.
+    def system_inspect(self, parent):
+        notebook = wx.Notebook(parent)
+        functions = ((self.pc_inspect, 'system information'), (self.admin, 'User and password management'), (self.system_tools, 'Builtin windows diagnostic tools'))
+        for handler, label in functions:
+            page = wx.Panel(notebook)
+            notebook.AddPage(page, label)
+            buttons = handler(page)
+            sizer = wx.WrapSizer(wx.HORIZONTAL)
+            for button in buttons:
+                sizer.Add(button, 0, wx.ALL, 5)
+            page.SetSizer(sizer)
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        sizer.Add(notebook, 1, wx.EXPAND)
+        parent.SetSizer(sizer)
+
 if __name__ == '__main__':
     app = wx.App()
     frame = Frame()
     app.MainLoop()
+
+# the end!

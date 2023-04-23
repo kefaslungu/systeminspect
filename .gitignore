@@ -1,3 +1,4 @@
 exe_compiler/
-*.txt
 Windows Shortcuts/
+*.pyc
+next_gen_features.txt

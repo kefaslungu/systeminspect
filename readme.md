@@ -5,7 +5,9 @@ System Inspect is a program that provides detailed information on several hardwa
 This information is presented in a notebook interface with a tab for each category.
 
 ### System information:
+
 The program utilizes several functions to retrieve information on the following:
+
 * Basic information such as operating system information, and hardware manufacturer.
 * Detailed information on systems battery.
 * computer's BIOS

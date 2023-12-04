@@ -22,7 +22,8 @@ from pc_info import (
     ram,
     sound,
     startup)
-
+from wigits.menubar import Menubar
+from wigits import createButtons
 class Frame(wx.Frame):
     """This is the class that inherit the wx frame, and all other functions are written in this class, or is used to call other functions else where."""
     def __init__(self):
@@ -31,6 +32,8 @@ class Frame(wx.Frame):
         self.username = environ['username']
 
         self.system_inspect(self.pnl)
+        menubar = Menubar(self)
+        self.SetMenuBar(menubar)
         self.Show()
 
     def create_button(self, parent, label, handler):
